@@ -1,0 +1,26 @@
+{
+  "name": "hydra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "doctor": "bash scripts/doctor.sh",
+    "hunt": "tsx scripts/hunt_once.ts",
+    "promote": "tsx scripts/promote_wallet.ts",
+    "replay": "tsx scripts/paper_copy_replay.ts",
+    "smoke": "tsx scripts/smoke_dust_swap.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.5.0",
+    "zod": "^3.23.0"
+  }
+}
