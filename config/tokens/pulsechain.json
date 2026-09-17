@@ -1,0 +1,11 @@
+{
+  "chain": "pulsechain",
+  "chainId": 369,
+  "tokens": [
+    {
+      "symbol": "WPLS",
+      "address": "0xA1077a294dF1B9D4bBBf7bC9D7A2b8Fd9c6aA9F2",
+      "decimals": 18
+    }
+  ]
+}

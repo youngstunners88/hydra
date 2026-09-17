@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  browser-hunter:
+    build:
+      context: ./services/browser-hunter
+    # swap for real .env.hunt
+    env_file:
+      - .env.hunt.example
+    # This service must never mount or receive EVM_PRIVATE_KEY or
+    # SOLANA_PRIVATE_KEY. It is intel-only by construction.
+    ports:
+      - "8090:8090"
+    restart: unless-stopped

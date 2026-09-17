@@ -1,0 +1,11 @@
+{
+  "chain": "robinhood_chain",
+  "chainId": 4663,
+  "tokens": [
+    {
+      "symbol": "WETH",
+      "address": "0xYourRobinhoodWrappedNativeAddressHere",
+      "decimals": 18
+    }
+  ]
+}

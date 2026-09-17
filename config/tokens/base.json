@@ -1,0 +1,11 @@
+{
+  "chain": "base",
+  "chainId": 8453,
+  "tokens": [
+    {
+      "symbol": "WETH",
+      "address": "0x4200000000000000000000000000000000000006",
+      "decimals": 18
+    }
+  ]
+}

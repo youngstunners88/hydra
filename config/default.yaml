@@ -1,0 +1,64 @@
+mode: paper
+halt: false
+auto_promote: false
+
+intel:
+  gmgn:
+    enabled: true
+    skills: true
+  agent_reach:
+    enabled: true
+    platforms:
+      - x
+      - reddit
+      - web
+      - youtube
+      - github
+  browser_use:
+    enabled: true
+    max_steps: 20
+    max_seconds: 90
+    allowlist: config/allowlists/domains.txt
+
+hunt:
+  min_watch_score: 72
+  min_trust_score: 80
+  promotion_window_hours: 24
+  sybil_n: 4
+  max_watchlist: 200
+  max_copy_wallets: 5
+  source_weights:
+    gmgn.rank: 1.0
+    gmgn.radar: 0.9
+    chain.early_buyer: 0.8
+    reach.x: 0.25
+    browser.pulse_dex: 0.7
+
+venues:
+  solana:
+    enabled: true
+    maxOrderUsd: 250
+    maxSlippageBps: 100
+  base:
+    enabled: true
+    chainId: 8453
+    maxOrderUsd: 250
+  robinhood_chain:
+    enabled: true
+    chainId: 4663
+    maxOrderUsd: 250
+  pulsechain:
+    enabled: true
+    chainId: 369
+    maxOrderUsd: 100
+    maxSlippageBps: 150
+  robinhood_crypto:
+    enabled: false
+
+risk:
+  maxDailyUsd: 1000
+  maxDailyLossUsd: 150
+  maxTokenUsd: 200
+  maxCopyFractionOfWallet: 0.15
+  allowUnknownTokens: false
+  approvalMode: exact

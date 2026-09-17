@@ -1,0 +1,10 @@
+{
+  "chain": "solana",
+  "tokens": [
+    {
+      "symbol": "SOL",
+      "address": "So11111111111111111111111111111111111111112",
+      "decimals": 9
+    }
+  ]
+}
