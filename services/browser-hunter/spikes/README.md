@@ -23,8 +23,13 @@ this script passing.
 
 ## Status as of 2026-09-18
 
-**Not run.** This environment has none of: `TYPESAFE_API_KEY`, `TEXT_MODEL_API_KEY`, a Chrome
-binary, or Python ≥ 3.12 (jev-ultrafast's stated minimum; this environment has 3.11). The
-script below is written and statically checked (`py_compile` clean, imports verified against
-the real package layout at commit `452c1ad`) but has not executed against a live page. Running
-it for real needs an environment with all four of those present.
+**Run for real, and the result reframes the question.** The user supplied the missing
+`TYPESAFE_API_KEY`; `TEXT_MODEL_API_KEY` was pointed at the existing `OPENROUTER_API_KEY`.
+All three tested allowlisted domains (gmgn.ai, dexscreener.com, geckoterminal.com) returned a
+Cloudflare bot-check page instead of real content — not a jev-ultrafast-specific failure, a
+network-fingerprint one that would hit base `browser-use` identically. Full writeup:
+`RESULTS-2026-09-18.md` in this directory.
+
+**The open question is no longer "which browser-automation engine" — it's whether headless
+automated browsing can reach these sites at all from wherever Hydra actually deploys.** That
+needs answering before either engine choice matters.
