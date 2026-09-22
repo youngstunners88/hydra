@@ -103,8 +103,23 @@ signal, is "the engine behind every strategy template".
 
 32 tests, 5 guards mutation-verified, all caught. `npm test`.
 
+## The promotion gate: ANSWERED, and it was half-enforced
+
+`lifecycle.ts` genuinely refuses `watchlisted -> trusted` without
+`paperMetricsPassed`, and the adjacency table blocks rank-skipping. That part
+is real and was already correct.
+
+**But `paperMetricsPassed` was a boolean handed in by the caller.** Nothing
+computed it. No paper book, no baseline comparison, no outcome record. A gate
+whose evidence is supplied by the thing being gated is a formality.
+
+`packages/risk/src/journal.ts` closes it. `paperMetricsPassed()` is derived
+from resolved outcomes and cannot be asserted.
+
 ## Open
 
 - Base and Robinhood Chain throughput: **unmeasured**, RPCs blocked here.
 - PulseChain pool counterparty count: **unmeasured**, and it is the next test.
-- Whether the promotion gate is enforced in code or only in SPEC: **unverified**.
+- Nothing yet WRITES to the journal — the hunter must call `record()` on each
+  paper-copy decision and `resolve()` when the trade closes. Until it does,
+  `paperMetricsPassed` correctly returns false on an absence.
