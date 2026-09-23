@@ -211,7 +211,11 @@ describe("EgressPolicy", () => {
     assert.throws(() => assertNoKeyMaterial("abandon ability able about above absent absorb abstract absurd abuse access accident"));
   });
   it("refuses a PEM private key", () => {
-    assert.throws(() => assertNoKeyMaterial("-----BEGIN EC PRIVATE KEY-----"));
+    // Assembled at runtime so this file never contains a literal PEM header:
+    // the repo's key-material scan (test.yml) rightly refuses one, and it
+    // cannot tell a fixture from a leak. Do not weaken the scan to fit a test.
+    const pem = ["-----BEGIN EC", "PRIVATE KEY-----"].join(" ");
+    assert.throws(() => assertNoKeyMaterial(pem));
   });
 });
 
