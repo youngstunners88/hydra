@@ -35,6 +35,18 @@
     "./sources/rpcHunter.ts": {
       "types": "./src/sources/rpcHunter.ts",
       "default": "./src/sources/rpcHunter.ts"
+    },
+    "./resolve/rule.ts": {
+      "types": "./src/resolve/rule.ts",
+      "default": "./src/resolve/rule.ts"
+    },
+    "./resolve/chainReader.ts": {
+      "types": "./src/resolve/chainReader.ts",
+      "default": "./src/resolve/chainReader.ts"
+    },
+    "./resolve/resolver.ts": {
+      "types": "./src/resolve/resolver.ts",
+      "default": "./src/resolve/resolver.ts"
     }
   },
   "main": "./src/index.ts",

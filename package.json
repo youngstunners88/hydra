@@ -17,7 +17,8 @@
     "replay": "tsx scripts/paper_copy_replay.ts",
     "smoke": "tsx scripts/smoke_dust_swap.ts",
     "test": "node --test --experimental-strip-types packages/*/tests/*.test.ts",
-    "paper:status": "node --experimental-strip-types scripts/paper_status.ts"
+    "paper:status": "node --experimental-strip-types scripts/paper_status.ts",
+    "resolve": "node --experimental-strip-types scripts/resolve_outcomes.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

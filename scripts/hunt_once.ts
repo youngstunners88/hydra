@@ -116,8 +116,20 @@ async function main(argv: string[]): Promise<number> {
     console.log(`threshold  registered tau=0.7 for ${PROMOTION_ACTION}`);
   }
 
+  // ONE DECISION PER WALLET, EVER. A whale seen every hour would otherwise
+  // become twenty correlated samples of the same prediction, and the 97-outcome
+  // minimum is derived assuming independent ones -- n would be inflated and
+  // the confidence interval would be a fiction.
+  const seen = new Set(
+    journal.all(PROMOTION_ACTION).map((r) => r.answer.split(":")[0]),
+  );
+  const fresh = observations.filter((o) => !seen.has(o.address));
+  if (fresh.length < observations.length) {
+    console.log(`skipped    ${observations.length - fresh.length} wallet(s) already journalled`);
+  }
+
   let recorded = 0;
-  for (const o of observations) {
+  for (const o of fresh) {
     const native = (o.raw as { nativeValue: number }).nativeValue;
     const out = promote(
       journal,

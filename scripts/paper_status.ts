@@ -23,7 +23,9 @@ function main(argv: string[]): number {
   try {
     const parsed = parseArgs(argv, { withValue: ["days"] });
     path = parsed.positional[0] ?? DEFAULT_LOG;
-    requiredDays = numberFlag(parsed, "days", 30);
+    // 2 days: the user's explicit decision on 2026-09-23, matching
+    // tradecc's MINIMUM_PAPER_TRADING_DAYS. The 97-resolved check is unchanged.
+    requiredDays = numberFlag(parsed, "days", 2);
   } catch (e) {
     console.error((e as Error).message);
     return 2;
