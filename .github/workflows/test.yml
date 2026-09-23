@@ -31,9 +31,28 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # The risk package is deliberately dependency-free, so the suite runs
-      # with no install at all. If a package ever needs real deps, add a pnpm
-      # install step rather than making every job carry one now.
+      # The suite used to run with no install at all, because the only tested
+      # package was dependency-free. The hunter tests changed that: they reach
+      # `lifecycle.ts`, which imports `@hydra/core`, and a workspace package
+      # does not resolve without the workspace links. The previous comment
+      # here said to add this step when that day came, so here it is.
+      #
+      # `--frozen-lockfile` is the point of committing pnpm-lock.yaml: CI
+      # installs exactly what was resolved locally, or it fails. An install
+      # that silently picks newer versions makes a green run say nothing about
+      # the code that was actually reviewed.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+
+      # Types are checked in CI now too. This was failing on EVERY file in the
+      # repo and nobody knew, because CI only ever ran the tests.
+      - name: Typecheck
+        run: npx tsc --noEmit --project tsconfig.base.json
+
       - name: Discover test files
         id: find
         run: |

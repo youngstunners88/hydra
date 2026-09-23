@@ -1,4 +1,4 @@
-import type { Amount, HealthStatus, Observation, VenueId } from "./types.js";
+import type { Amount, HealthStatus, Observation, VenueId } from "./types.ts";
 
 /**
  * Hydra's append-only event envelope.

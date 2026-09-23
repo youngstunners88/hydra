@@ -103,6 +103,16 @@ const DEFAULT_BUCKETS = 10;
 export class DecisionJournal {
   readonly #records = new Map<string, DecisionRecord>();
   readonly #policies = new Map<string, ThresholdPolicy>();
+  /**
+   * EVERY version ever set, not just the current one.
+   *
+   * A decision records the threshold VERSION it was judged under, and refusal
+   * #1 is that history is never re-graded against a new number. That promise
+   * is only auditable if the old number can still be looked up. Keeping only
+   * the current policy made `thresholdVersion` a number pointing at nothing
+   * the moment a threshold was revised.
+   */
+  readonly #policyHistory = new Map<string, ThresholdPolicy[]>();
   #seq = 0;
   readonly #now: () => number;
 
@@ -138,6 +148,9 @@ export class DecisionJournal {
       reason: reason.trim(),
     };
     this.#policies.set(action, policy);
+    const history = this.#policyHistory.get(action) ?? [];
+    history.push(policy);
+    this.#policyHistory.set(action, history);
     return policy;
   }
 
@@ -324,15 +337,69 @@ export class DecisionJournal {
 
   /** Threshold history for an action, oldest first. The audit answer. */
   thresholdHistory(action: string): readonly ThresholdPolicy[] {
-    const current = this.#policies.get(action);
-    return current ? [current] : [];
+    return [...(this.#policyHistory.get(action) ?? [])];
+  }
+
+  /**
+   * The exact policy a decision was judged under.
+   *
+   * This is what makes "a threshold change never re-grades history" checkable
+   * rather than merely stated.
+   */
+  policyAtVersion(action: string, version: number): ThresholdPolicy {
+    const found = this.#policyHistory
+      .get(action)
+      ?.find((p) => p.version === version);
+    if (!found) {
+      throw new JournalError(
+        `no version ${version} of the threshold for "${action}"`,
+      );
+    }
+    return found;
   }
 
   toJSON(): string {
     return JSON.stringify(
-      { decisions: this.all(), policies: [...this.#policies.values()] },
+      {
+        decisions: this.all(),
+        policies: [...this.#policies.values()],
+        policyHistory: [...this.#policyHistory.values()].flat(),
+      },
       null,
       1,
     );
+  }
+
+  /**
+   * Rebuild a journal from a durable log. Used by `JournalStore`.
+   *
+   * Replay must NOT re-derive `route`, `thresholdVersion` or `tauAtDecision`:
+   * those were fixed by the policy in force at the time, and recomputing them
+   * against today's threshold is precisely the re-grading refusal #1 forbids.
+   * So records are reinstated verbatim.
+   */
+  static replay(
+    policies: readonly ThresholdPolicy[],
+    records: readonly DecisionRecord[],
+    now: () => number = Date.now,
+  ): DecisionJournal {
+    const j = new DecisionJournal(now);
+    for (const p of [...policies].sort((a, b) => a.version - b.version)) {
+      const history = j.#policyHistory.get(p.action) ?? [];
+      history.push(p);
+      j.#policyHistory.set(p.action, history);
+      const current = j.#policies.get(p.action);
+      if (!current || p.version > current.version) j.#policies.set(p.action, p);
+    }
+    let maxSeq = 0;
+    for (const r of records) {
+      j.#records.set(r.id, r);
+      const n = Number.parseInt(r.id.slice(1), 10);
+      if (Number.isFinite(n) && n > maxSeq) maxSeq = n;
+    }
+    // Continue the id sequence past everything replayed, or the next record()
+    // would reuse an id and silently overwrite a resolved decision.
+    j.#seq = maxSeq;
+    return j;
   }
 }

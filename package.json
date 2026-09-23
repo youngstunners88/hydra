@@ -16,7 +16,8 @@
     "promote": "tsx scripts/promote_wallet.ts",
     "replay": "tsx scripts/paper_copy_replay.ts",
     "smoke": "tsx scripts/smoke_dust_swap.ts",
-    "test": "node --test --experimental-strip-types packages/*/tests/*.test.ts"
+    "test": "node --test --experimental-strip-types packages/*/tests/*.test.ts",
+    "paper:status": "node --experimental-strip-types scripts/paper_status.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

@@ -4,9 +4,18 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "strict": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    // The whole repo runs .ts directly -- every script is `tsc --noEmit` and
+    // the test suite is `node --experimental-strip-types`. Nothing has ever
+    // consumed emitted output, so emit is turned off explicitly rather than
+    // configured for a build that does not happen. `declaration`,
+    // `declarationMap` and `sourceMap` were describing that build and are
+    // gone with it; they are also incompatible with the next line.
+    "noEmit": true,
+    // Source and tests both import with explicit `.ts` specifiers, which is
+    // what type stripping needs at runtime. Without this, `pnpm typecheck`
+    // failed on EVERY file in the repo -- it went unnoticed because CI runs
+    // the tests and never ran the typecheck.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
