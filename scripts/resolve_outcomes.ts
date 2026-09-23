@@ -16,6 +16,8 @@ import { httpJsonRpc } from "../packages/hunter/src/sources/rpcHunter.ts";
 import { assertSealed } from "../packages/decide/src/resolve/rule.ts";
 import { RpcChainReader } from "../packages/hunter/src/sources/rpcChainReader.ts";
 import { resolvePending } from "../packages/decide/src/resolve/resolver.ts";
+import { CachedChainReader } from "../packages/decide/src/resolve/chain.ts";
+import type { Fate } from "../packages/decide/src/resolve/resolver.ts";
 import type { ResolvingJournal } from "../packages/decide/src/resolve/resolver.ts";
 
 const LOG = process.env.HYDRA_JOURNAL ?? "ops/journal/decisions.jsonl";
@@ -34,14 +36,35 @@ async function main(argv: string[]): Promise<number> {
     ? { pending: (a) => persistent.pending(a), resolve: () => undefined }
     : persistent;
 
-  const report = await resolvePending(
-    journal, new RpcChainReader(httpJsonRpc(ENDPOINT)), PROMOTION_ACTION,
-  );
-
+  // Every wallet_promotion action: the legacy one and each experiment arm.
+  // Each is resolved on its own -- the journal never mixes them -- but they
+  // share one cached reader, because the arms read the same wallets at the
+  // same moments.
+  const actions = [...new Set(persistent.all().map((r) => r.action))]
+    .filter((a) => a === PROMOTION_ACTION || a.startsWith(`${PROMOTION_ACTION}@`))
+    .sort();
+  const reader = new CachedChainReader(new RpcChainReader(httpJsonRpc(ENDPOINT)));
+  const fates: Fate[] = [];
+  let rule = "";
+  const perAction: string[] = [];
+  for (const action of actions) {
+    const r = await resolvePending(journal, reader, action);
+    rule = r.rule;
+    fates.push(...r.fates);
+    perAction.push(`  ${action.padEnd(30)} resolved ${r.resolved}  immature ${r.immature}  unreadable ${r.unreadable}`);
+  }
+  const report = {
+    rule, fates,
+    resolved: fates.filter((f) => f.kind === "resolved").length,
+    immature: fates.filter((f) => f.kind === "immature").length,
+    unreadable: fates.filter((f) => f.kind === "unreadable").length,
+  };
   console.log(`rule        ${report.rule}`);
   console.log(`resolved    ${report.resolved}${dryRun ? " (dry run: not written)" : ""}`);
   console.log(`immature    ${report.immature}`);
   console.log(`unreadable  ${report.unreadable}`);
+  for (const line of perAction) console.log(line);
+  console.log(`chain reads ${reader.reads}`);
   for (const f of report.fates) {
     if (f.kind === "resolved") {
       console.log(`  ${f.id} ${f.wallet.slice(0, 10)}… ${f.correct ? "CORRECT" : "WRONG  "} ${f.before} -> ${f.after} wei`);

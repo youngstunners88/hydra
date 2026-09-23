@@ -5,3 +5,4 @@ export * from "./router.ts";
 export * from "./adapters/jevHttp.ts";
 export * from "./adapters/permuted.ts";
 export * from "./adapters/scripted.ts";
+export * from "./adapters/capture.ts";

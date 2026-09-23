@@ -56,3 +56,53 @@ export async function blockAtOrBefore(
   }
   return lo;
 }
+
+/**
+ * Memoises reads, as a decorator over any ChainReader.
+ *
+ * The experiment records up to three arms per wallet at nearly the same
+ * moment, and resolving each arm repeats the same balance reads and the same
+ * ~25-step block search. Historical state at a fixed height never changes, so
+ * caching it is exact, not approximate. `head()` is NOT cached: it is the one
+ * read whose answer is supposed to move.
+ */
+export class CachedChainReader implements ChainReader {
+  readonly #inner: ChainReader;
+  readonly #headers = new Map<number, Promise<BlockHeader>>();
+  readonly #balances = new Map<string, Promise<bigint>>();
+  reads = 0;
+
+  constructor(inner: ChainReader) {
+    this.#inner = inner;
+  }
+
+  head(): Promise<BlockHeader> {
+    this.reads += 1;
+    return this.#inner.head();
+  }
+
+  header(height: number): Promise<BlockHeader> {
+    let p = this.#headers.get(height);
+    if (!p) {
+      this.reads += 1;
+      p = this.#inner.header(height);
+      // A failed read must not be cached, or one transient error would make
+      // that height permanently unreadable for the rest of the run.
+      p.catch(() => this.#headers.delete(height));
+      this.#headers.set(height, p);
+    }
+    return p;
+  }
+
+  balanceAt(address: string, height: number): Promise<bigint> {
+    const k = `${address}@${height}`;
+    let p = this.#balances.get(k);
+    if (!p) {
+      this.reads += 1;
+      p = this.#inner.balanceAt(address, height);
+      p.catch(() => this.#balances.delete(k));
+      this.#balances.set(k, p);
+    }
+    return p;
+  }
+}

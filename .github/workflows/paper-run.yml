@@ -7,8 +7,11 @@ name: paper-run
 # it is merged to main. Until then, `workflow_dispatch` or `pnpm hunt` /
 # `pnpm resolve` by hand.
 #
-# Hunt plane only. No secret is referenced anywhere in this file: the job
-# reads a public RPC and writes to this repository, nothing else.
+# Hunt plane only. ONE secret is referenced, on the hunt step only:
+# OPENROUTER_API_KEY, the read-only decision-API key for experiment
+# permutation-brier-v1's Jev arms. It is not a wallet key and signs nothing.
+# If the repo secret is absent the step still runs -- the Jev arms are skipped
+# and only the heuristic arm is recorded.
 on:
   schedule:
     - cron: "17 * * * *"   # hourly, off the top of the hour
@@ -48,6 +51,8 @@ jobs:
         run: pnpm resolve
 
       - name: Hunt
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: pnpm hunt -- --blocks 5 --min-value 50000
 
       - name: Status
