@@ -33,6 +33,19 @@ importers:
 
   packages/core: {}
 
+  packages/decide:
+    dependencies:
+      '@hydra/core':
+        specifier: workspace:*
+        version: link:../core
+      '@hydra/risk':
+        specifier: workspace:*
+        version: link:../risk
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/exec:
     dependencies:
       '@hydra/core':
@@ -54,9 +67,6 @@ importers:
       '@hydra/intel':
         specifier: workspace:*
         version: link:../intel
-      '@hydra/risk':
-        specifier: workspace:*
-        version: link:../risk
     devDependencies:
       typescript:
         specifier: ^5.5.0

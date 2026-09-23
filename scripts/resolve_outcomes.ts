@@ -11,12 +11,12 @@
 import { readFileSync } from "node:fs";
 import { FileSink, PersistentJournal } from "../packages/risk/src/journalStore.ts";
 import { parseArgs } from "../packages/risk/src/cliArgs.ts";
-import { PROMOTION_ACTION } from "../packages/hunter/src/promotion.ts";
+import { PROMOTION_ACTION } from "../packages/decide/src/promotion.ts";
 import { httpJsonRpc } from "../packages/hunter/src/sources/rpcHunter.ts";
-import { assertSealed } from "../packages/hunter/src/resolve/rule.ts";
-import { RpcChainReader } from "../packages/hunter/src/resolve/chainReader.ts";
-import { resolvePending } from "../packages/hunter/src/resolve/resolver.ts";
-import type { ResolvingJournal } from "../packages/hunter/src/resolve/resolver.ts";
+import { assertSealed } from "../packages/decide/src/resolve/rule.ts";
+import { RpcChainReader } from "../packages/hunter/src/sources/rpcChainReader.ts";
+import { resolvePending } from "../packages/decide/src/resolve/resolver.ts";
+import type { ResolvingJournal } from "../packages/decide/src/resolve/resolver.ts";
 
 const LOG = process.env.HYDRA_JOURNAL ?? "ops/journal/decisions.jsonl";
 const RULE = "ops/journal/resolution-rule.json";

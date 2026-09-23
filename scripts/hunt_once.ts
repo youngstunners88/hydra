@@ -36,7 +36,7 @@
  */
 
 import { PersistentJournal, FileSink } from "../packages/risk/src/journalStore.ts";
-import { promote, PROMOTION_ACTION } from "../packages/hunter/src/promotion.ts";
+import { promote, PROMOTION_ACTION } from "../packages/decide/src/promotion.ts";
 import { RpcHunter, httpJsonRpc } from "../packages/hunter/src/sources/rpcHunter.ts";
 import { numberFlag, parseArgs } from "../packages/risk/src/cliArgs.ts";
 import type { Observation } from "../packages/core/src/index.ts";

@@ -14,8 +14,8 @@
  */
 
 import { HORIZON_HOURS, RULE_ID, judge } from "./rule.ts";
-import { blockAtOrBefore } from "./chainReader.ts";
-import type { BlockHeader, ChainReader } from "./chainReader.ts";
+import { blockAtOrBefore } from "./chain.ts";
+import type { BlockHeader, ChainReader } from "./chain.ts";
 
 export interface PendingDecision {
   readonly id: string;

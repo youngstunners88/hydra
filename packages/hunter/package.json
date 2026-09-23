@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@hydra/core": "workspace:*",
-    "@hydra/intel": "workspace:*",
-    "@hydra/risk": "workspace:*"
+    "@hydra/intel": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
@@ -20,14 +19,6 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./lifecycle.ts": {
-      "types": "./src/lifecycle.ts",
-      "default": "./src/lifecycle.ts"
-    },
-    "./promotion.ts": {
-      "types": "./src/promotion.ts",
-      "default": "./src/promotion.ts"
-    },
     "./ports.ts": {
       "types": "./src/ports.ts",
       "default": "./src/ports.ts"
@@ -36,17 +27,9 @@
       "types": "./src/sources/rpcHunter.ts",
       "default": "./src/sources/rpcHunter.ts"
     },
-    "./resolve/rule.ts": {
-      "types": "./src/resolve/rule.ts",
-      "default": "./src/resolve/rule.ts"
-    },
-    "./resolve/chainReader.ts": {
-      "types": "./src/resolve/chainReader.ts",
-      "default": "./src/resolve/chainReader.ts"
-    },
-    "./resolve/resolver.ts": {
-      "types": "./src/resolve/resolver.ts",
-      "default": "./src/resolve/resolver.ts"
+    "./sources/rpcChainReader.ts": {
+      "types": "./src/sources/rpcChainReader.ts",
+      "default": "./src/sources/rpcChainReader.ts"
     }
   },
   "main": "./src/index.ts",

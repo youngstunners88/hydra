@@ -53,6 +53,21 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit --project tsconfig.base.json
 
+      # SPEC section 8's dependency table, enforced. It was prose from day one
+      # and the first time it was checked it found two violations.
+      - name: Layer boundaries
+        run: pnpm layers
+
+      # Entry points exercised THROUGH pnpm, the way paper-run.yml calls them.
+      # pnpm forwards `--` to the script; direct `node` runs never do, which
+      # is how a crash on every scheduled run went unnoticed. The resolver runs
+      # against an EMPTY journal so it makes no network reads: this step tests
+      # argument handling and the rule seal, not the chain.
+      - name: Entry points run through pnpm
+        run: |
+          pnpm paper:status -- --days 2 || test $? -eq 1   # 1 = blocked, expected
+          HYDRA_JOURNAL="$RUNNER_TEMP/empty/decisions.jsonl" pnpm resolve -- --dry-run
+
       - name: Discover test files
         id: find
         run: |

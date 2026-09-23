@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { describe, it } from "node:test";
-import { PlaneGuard, PlaneViolation } from "../../risk/src/planeGuard.ts";
+import { PlaneGuard, PlaneViolation } from "../../core/src/planeGuard.ts";
 import {
   RPC_HUNT_METHODS, RpcHunter, RpcHunterError, isEoaTransfer, weiToNative,
 } from "../src/sources/rpcHunter.ts";

@@ -33,7 +33,7 @@
  */
 
 import type { ChainId, Observation } from "@hydra/core";
-import { PlaneGuard } from "@hydra/risk/planeGuard.ts";
+import { PlaneGuard } from "@hydra/core/planeGuard.ts";
 
 /** The only JSON-RPC methods this hunter may ever send. Both are reads. */
 export const RPC_HUNT_METHODS: readonly string[] = [

@@ -1,5 +1,6 @@
 /**
- * Read-only chain access for resolving outcomes, behind a PlaneGuard.
+ * Read-only chain access (hunt-plane ADAPTER) for the decision plane's
+ * ChainReader port, behind a PlaneGuard.
  *
  * Three JSON-RPC methods, all reads. The resolver needs one more than the
  * hunter -- `eth_getBalance` at a historical block -- and gets its own closed
@@ -12,8 +13,8 @@
  * decision stays UNREADABLE -- it is never resolved on a guess.
  */
 
-import { PlaneGuard } from "@hydra/risk/planeGuard.ts";
-import type { JsonRpcFetch } from "../sources/rpcHunter.ts";
+import { PlaneGuard } from "@hydra/core/planeGuard.ts";
+import type { JsonRpcFetch } from "./rpcHunter.ts";
 
 export const RESOLVE_METHODS: readonly string[] = [
   "eth_blockNumber",
@@ -23,16 +24,12 @@ export const RESOLVE_METHODS: readonly string[] = [
 
 export class ChainReadError extends Error {}
 
+/** Structurally identical to decide's BlockHeader; declared here so the hunt
+ *  plane does not import the decision plane. The control plane's typecheck is
+ *  what proves the two agree -- it passes this adapter where the port is due. */
 export interface BlockHeader {
   readonly number: number;
-  /** Unix seconds. */
   readonly timestamp: number;
-}
-
-export interface ChainReader {
-  head(): Promise<BlockHeader>;
-  header(height: number): Promise<BlockHeader>;
-  balanceAt(address: string, height: number): Promise<bigint>;
 }
 
 const hex = (n: number) => `0x${n.toString(16)}`;
@@ -44,7 +41,7 @@ function parseQuantity(raw: unknown, what: string): bigint {
   return BigInt(raw);
 }
 
-export class RpcChainReader implements ChainReader {
+export class RpcChainReader {
   readonly #fetch: JsonRpcFetch;
   readonly #guard: PlaneGuard;
 
@@ -84,39 +81,4 @@ export class RpcChainReader implements ChainReader {
     const raw = await this.#send("eth_getBalance", [address, hex(height)]);
     return parseQuantity(raw, `balance of ${address} at ${height}`);
   }
-}
-
-/**
- * The latest block whose timestamp is <= `unixSeconds`.
- *
- * Binary search over headers: ~25 reads for a chain of tens of millions of
- * blocks. "Latest block at or before" rather than "nearest", because the
- * nearest block can be one mined AFTER the moment in question -- and reading
- * state from after a decision is exactly the look-ahead this rule must not
- * contain.
- */
-export async function blockAtOrBefore(
-  reader: ChainReader,
-  unixSeconds: number,
-  head?: BlockHeader,
-): Promise<BlockHeader> {
-  const top = head ?? (await reader.head());
-  if (unixSeconds >= top.timestamp) return top;
-
-  const genesis = await reader.header(0);
-  if (unixSeconds < genesis.timestamp) {
-    throw new ChainReadError(
-      `time ${unixSeconds} precedes genesis (${genesis.timestamp}); no block exists`,
-    );
-  }
-
-  // Invariant: lo.timestamp <= t < hi.timestamp.
-  let lo = genesis;
-  let hi = top;
-  while (hi.number - lo.number > 1) {
-    const mid = await reader.header(Math.floor((lo.number + hi.number) / 2));
-    if (mid.timestamp <= unixSeconds) lo = mid;
-    else hi = mid;
-  }
-  return lo;
 }

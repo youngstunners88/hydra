@@ -37,6 +37,11 @@ export function parseArgs(argv: readonly string[], spec: FlagSpec): ParsedArgs {
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i] as string;
+    // pnpm forwards the `--` in `pnpm hunt -- --blocks 5` to the script
+    // verbatim. Treated as an unknown flag, it crashed every pnpm-invoked run
+    // -- including paper-run.yml's, which would have failed on its first
+    // scheduled tick. Found by running through pnpm instead of `node` directly.
+    if (arg === "--") continue;
     if (!arg.startsWith("--")) {
       positional.push(arg);
       continue;

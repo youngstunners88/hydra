@@ -43,6 +43,16 @@ describe("parseArgs", () => {
   });
 });
 
+describe("pnpm's forwarded separator", () => {
+  it("ignores a bare -- so `pnpm hunt -- --blocks 5` works", () => {
+    // Every scheduled paper-run invocation goes through pnpm with `--`.
+    const p = parseArgs(["--", "--days", "7", "--dry-run"], SPEC);
+    assert.equal(p.flags["days"], "7");
+    assert.equal(p.booleans.has("dry-run"), true);
+    assert.deepEqual(p.positional, []);
+  });
+});
+
 describe("numberFlag", () => {
   it("returns the fallback when absent", () => {
     assert.equal(numberFlag(parseArgs([], SPEC), "days", 30), 30);

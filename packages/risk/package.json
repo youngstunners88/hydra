@@ -26,10 +26,6 @@
       "types": "./src/journalStore.ts",
       "default": "./src/journalStore.ts"
     },
-    "./planeGuard.ts": {
-      "types": "./src/planeGuard.ts",
-      "default": "./src/planeGuard.ts"
-    },
     "./ratchet.ts": {
       "types": "./src/ratchet.ts",
       "default": "./src/ratchet.ts"

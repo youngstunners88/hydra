@@ -23,11 +23,11 @@
  *   2. derives `paperMetricsPassed` from the journal, never from the caller.
  *   3. returns the decision id, which is what `resolve()` needs later.
  *
- * TWO-PLANE RULE
+ * PLANE
  *
- * This file lives in hunter and imports risk. That direction is fine -- the
- * hunt plane may consult risk. It signs nothing, touches no venue, and holds
- * no key. The reverse import would not be fine and does not exist.
+ * DECISION plane (SPEC section 1: "score/risk/promote"). It signs nothing,
+ * touches no venue and holds no key. It imports neither hunter nor exec;
+ * ops/layers.json and scripts/check_layers.ts enforce that.
  */
 
 import { canTransition } from "./lifecycle.ts";

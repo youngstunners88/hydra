@@ -1,0 +1,13 @@
+{
+  "_what": "The dependency rule SPEC.md section 8 states in prose, as data a checker enforces. scripts/check_layers.ts fails CI on any edge not listed here. Deny by default: a package not listed may import nothing in-repo.",
+  "_planes": "core = shared spine. hunter = HUNT plane (discover, read chain). decide = DECISION plane (lifecycle, promotion, resolution, Jev). risk = decision-plane policy + journal. exec = EXEC plane. intel = hunt-plane intel ports. scripts/ and apps/ are the CONTROL plane and are the only place concrete adapters from different planes are wired together.",
+  "allow": {
+    "core":   [],
+    "config": [],
+    "intel":  ["core"],
+    "risk":   ["core"],
+    "hunter": ["core", "intel"],
+    "decide": ["core", "risk"],
+    "exec":   ["core", "risk"]
+  }
+}

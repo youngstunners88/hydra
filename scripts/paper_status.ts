@@ -13,7 +13,7 @@
 import { FileSink, PersistentJournal, paperRunStatus } from "../packages/risk/src/journalStore.ts";
 import { numberFlag, parseArgs } from "../packages/risk/src/cliArgs.ts";
 import { MIN_RESOLVED_FOR_VERDICT } from "../packages/risk/src/journal.ts";
-import { PROMOTION_ACTION } from "../packages/hunter/src/promotion.ts";
+import { PROMOTION_ACTION } from "../packages/decide/src/promotion.ts";
 
 const DEFAULT_LOG = "ops/journal/decisions.jsonl";
 
