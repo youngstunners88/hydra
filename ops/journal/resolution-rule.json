@@ -1,0 +1,7 @@
+{
+  "rule_id": "native-retention-6h-v1",
+  "sha256": "3c19f12418946cd1a5ff3c83367cc6f7a4aff8a756962a901f8413c58bcbc87a",
+  "sealed_at": "2026-09-23T09:35:45.125Z",
+  "horizon_hours": 6,
+  "text": "rule: native-retention-6h-v1\ndecision: promote wallet W from watchlisted to trusted, confidence c\nt0: the latest block with timestamp <= the decision's recorded time\nt1: the latest block with timestamp <= t0 + 6 hours\nCORRECT iff native_balance(W, t1) >= native_balance(W, t0)\nIMMATURE if t0 + horizon is later than the chain head: NOT resolved\nUNREADABLE if any balance or block read fails: NOT resolved\nnever resolve an immature or unreadable decision as incorrect"
+}

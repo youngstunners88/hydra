@@ -1,0 +1,45 @@
+{
+  "name": "@hydra/decide",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit --project ../../tsconfig.base.json",
+    "typecheck": "tsc --noEmit --project ../../tsconfig.base.json"
+  },
+  "dependencies": {
+    "@hydra/core": "workspace:*",
+    "@hydra/risk": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./lifecycle.ts": {
+      "types": "./src/lifecycle.ts",
+      "default": "./src/lifecycle.ts"
+    },
+    "./promotion.ts": {
+      "types": "./src/promotion.ts",
+      "default": "./src/promotion.ts"
+    },
+    "./resolve/rule.ts": {
+      "types": "./src/resolve/rule.ts",
+      "default": "./src/resolve/rule.ts"
+    },
+    "./resolve/chain.ts": {
+      "types": "./src/resolve/chain.ts",
+      "default": "./src/resolve/chain.ts"
+    },
+    "./resolve/resolver.ts": {
+      "types": "./src/resolve/resolver.ts",
+      "default": "./src/resolve/resolver.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}

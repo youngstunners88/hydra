@@ -1,0 +1,72 @@
+name: paper-run
+
+# The paper clock only advances if decisions keep being recorded and resolved.
+# This runs the hunt and the resolver hourly and commits the journal back.
+#
+# GitHub runs `schedule` ONLY from the default branch, so this goes live when
+# it is merged to main. Until then, `workflow_dispatch` or `pnpm hunt` /
+# `pnpm resolve` by hand.
+#
+# Hunt plane only. No secret is referenced anywhere in this file: the job
+# reads a public RPC and writes to this repository, nothing else.
+on:
+  schedule:
+    - cron: "17 * * * *"   # hourly, off the top of the hour
+  workflow_dispatch:
+
+# One run at a time. Two overlapping runs would both append to the same JSONL
+# and the second push would conflict -- or worse, rebase cleanly and duplicate
+# a decision id.
+concurrency:
+  group: paper-run
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  hunt-and-resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - run: pnpm install --frozen-lockfile
+
+      # Resolve FIRST, so a decision that matured since the last run is graded
+      # before this run adds new ones. Order does not change any outcome, but it
+      # keeps each commit's diff readable: outcomes, then new decisions.
+      - name: Resolve matured decisions
+        run: pnpm resolve
+
+      - name: Hunt
+        run: pnpm hunt -- --blocks 5 --min-value 50000
+
+      - name: Status
+        run: pnpm paper:status || true   # exit 1 means "blocked", which is expected
+
+      - name: Commit the journal
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- ops/journal/; then
+            echo "Journal unchanged."
+            exit 0
+          fi
+          git config user.name  "hydra-paper-run"
+          git config user.email "hydra-paper-run@users.noreply.github.com"
+          git add ops/journal/
+          git commit -m "paper-run: journal update $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            git push && exit 0
+            git pull --rebase
+          done
+          echo "::error::could not push the journal after 3 attempts"
+          exit 1

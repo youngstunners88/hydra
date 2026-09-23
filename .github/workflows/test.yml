@@ -1,0 +1,105 @@
+name: test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# A second push to the same branch makes the first run's answer worthless.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 is the engines floor in package.json (">=20"), but type-stripping
+        # via --experimental-strip-types needs 22.6+. Both are pinned so a
+        # runner default bump cannot silently change what is exercised.
+        node-version: ["22.x", "24.x"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # The suite used to run with no install at all, because the only tested
+      # package was dependency-free. The hunter tests changed that: they reach
+      # `lifecycle.ts`, which imports `@hydra/core`, and a workspace package
+      # does not resolve without the workspace links. The previous comment
+      # here said to add this step when that day came, so here it is.
+      #
+      # `--frozen-lockfile` is the point of committing pnpm-lock.yaml: CI
+      # installs exactly what was resolved locally, or it fails. An install
+      # that silently picks newer versions makes a green run say nothing about
+      # the code that was actually reviewed.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+
+      # Types are checked in CI now too. This was failing on EVERY file in the
+      # repo and nobody knew, because CI only ever ran the tests.
+      - name: Typecheck
+        run: npx tsc --noEmit --project tsconfig.base.json
+
+      # SPEC section 8's dependency table, enforced. It was prose from day one
+      # and the first time it was checked it found two violations.
+      - name: Layer boundaries
+        run: pnpm layers
+
+      # Entry points exercised THROUGH pnpm, the way paper-run.yml calls them.
+      # pnpm forwards `--` to the script; direct `node` runs never do, which
+      # is how a crash on every scheduled run went unnoticed. The resolver runs
+      # against an EMPTY journal so it makes no network reads: this step tests
+      # argument handling and the rule seal, not the chain.
+      - name: Entry points run through pnpm
+        run: |
+          pnpm paper:status -- --days 2 || test $? -eq 1   # 1 = blocked, expected
+          HYDRA_JOURNAL="$RUNNER_TEMP/empty/decisions.jsonl" pnpm resolve -- --dry-run
+
+      - name: Discover test files
+        id: find
+        run: |
+          set -euo pipefail
+          FILES=$(find packages -path '*/tests/*.test.ts' | sort | tr '\n' ' ')
+          echo "files=${FILES}" >> "$GITHUB_OUTPUT"
+          echo "Found: ${FILES:-<none>}"
+
+      # A green tick on a run that collected nothing is worse than no CI at
+      # all: it reports "tests pass" when no test ran. If the layout changes
+      # and the glob stops matching, this fails loudly instead.
+      - name: Fail if no tests were found
+        if: steps.find.outputs.files == ''
+        run: |
+          echo "No packages/*/tests/*.test.ts files matched."
+          echo "A pass here would be a false green, so this fails instead."
+          exit 1
+
+      - name: Run tests
+        run: node --test --experimental-strip-types ${{ steps.find.outputs.files }}
+
+      # Hydra signs transactions. CLAUDE.md and the secrets-hygiene skill both
+      # say a leaked key is "direct, irreversible loss of the hot wallet", and
+      # the .env.exec.example file shows exactly the shape to watch for. The
+      # *.example files are excluded because their whole job is to carry
+      # placeholder names.
+      - name: Refuse committed key material
+        run: |
+          set -uo pipefail
+          PATTERN='((EVM|SOLANA|HOT_WALLET)_PRIVATE_KEY[[:space:]]*=[[:space:]]*(0x)?[A-Za-z0-9]{16,}|BEGIN [A-Z ]*PRIVATE[ ]KEY|[[:space:]]mnemonic[[:space:]]*=[[:space:]]*"?([a-z]+[[:space:]]+){11,})'
+          if git grep -nEI "$PATTERN" -- . ':!*.example' ':!.github/workflows/*'; then
+            echo "::error::Possible key material committed. Nothing above may be a real secret."
+            exit 1
+          fi
+          echo "No key material found."

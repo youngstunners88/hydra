@@ -9,6 +9,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./planeGuard.ts": {
+      "types": "./src/planeGuard.ts",
+      "default": "./src/planeGuard.ts"
     }
   },
   "scripts": {
