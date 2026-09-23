@@ -52,7 +52,7 @@ const ENDPOINT = process.env.PULSECHAIN_RPC ?? "https://rpc.pulsechain.com";
 async function main(argv: string[]): Promise<number> {
   const parsed = parseArgs(argv, {
     withValue: ["blocks", "min-value"],
-    boolean: ["dry-run"],
+    boolean: ["dry-run", "jev"],
   });
   const dryRun = parsed.booleans.has("dry-run");
   const blocks = numberFlag(parsed, "blocks", 3);
@@ -124,12 +124,18 @@ async function main(argv: string[]): Promise<number> {
     console.log(`skipped    ${observations.length - fresh.length} wallet(s) already journalled`);
   }
 
-  // Jev arms run only when a key is present. Key availability is independent
-  // of which wallets appear, so skipping the Jev arms for a run does not bias
-  // the paired sample -- it only shrinks it. The heuristic arm always runs.
-  const key = process.env.OPENROUTER_API_KEY;
-  const jev = key ? new JevHttpEngine({ getKey: () => process.env.OPENROUTER_API_KEY }) : null;
-  if (!jev) console.log("jev        no OPENROUTER_API_KEY: heuristic arm only this run");
+  // Jev arms are OPT-IN (--jev), never inferred from a key being present:
+  // GitHub Actions must stay heuristic-only (no model key on GitHub, user
+  // decision 2026-09-23), and a key that happens to be in some environment
+  // must not silently change what a run records. `pnpm jev:local` passes
+  // --jev and points at a separate journal.
+  const wantJev = parsed.booleans.has("jev");
+  if (wantJev && !process.env.OPENROUTER_API_KEY) {
+    console.error("--jev needs OPENROUTER_API_KEY in this machine's environment; refusing");
+    return 2;
+  }
+  const jev = wantJev ? new JevHttpEngine({ getKey: () => process.env.OPENROUTER_API_KEY }) : null;
+  if (!jev) console.log("jev        off (heuristic arm only)");
   const reader = new RpcChainReader(httpJsonRpc(ENDPOINT));
   const head = jev ? await reader.head() : null;
 
