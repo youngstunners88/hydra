@@ -37,26 +37,22 @@
 
 import { PersistentJournal, FileSink } from "../packages/risk/src/journalStore.ts";
 import { promote, PROMOTION_ACTION } from "../packages/decide/src/promotion.ts";
+import {
+  ARM_ACTIONS, confidenceFromValue, features, jevForecasts,
+} from "../packages/decide/src/experiment/retentionArms.ts";
+import { JevHttpEngine } from "../packages/decide/src/jev/adapters/jevHttp.ts";
 import { RpcHunter, httpJsonRpc } from "../packages/hunter/src/sources/rpcHunter.ts";
+import { RpcChainReader } from "../packages/hunter/src/sources/rpcChainReader.ts";
 import { numberFlag, parseArgs } from "../packages/risk/src/cliArgs.ts";
 import type { Observation } from "../packages/core/src/index.ts";
 
 const DEFAULT_LOG = "ops/journal/decisions.jsonl";
 const ENDPOINT = process.env.PULSECHAIN_RPC ?? "https://rpc.pulsechain.com";
 
-/** Transfer size -> confidence, clamped. Crude on purpose; see the header. */
-export function confidenceFromValue(native: number, floor: number): number {
-  if (!(native > 0) || !(floor > 0)) return 0.5;
-  const ratio = native / floor;
-  // log10 so a 10x transfer moves confidence by one step, not 10.
-  const raw = 0.5 + Math.log10(ratio) * 0.1;
-  return Math.min(0.95, Math.max(0.05, Number(raw.toFixed(4))));
-}
-
 async function main(argv: string[]): Promise<number> {
   const parsed = parseArgs(argv, {
     withValue: ["blocks", "min-value"],
-    boolean: ["dry-run"],
+    boolean: ["dry-run", "jev"],
   });
   const dryRun = parsed.booleans.has("dry-run");
   const blocks = numberFlag(parsed, "blocks", 3);
@@ -102,59 +98,91 @@ async function main(argv: string[]): Promise<number> {
   }
 
   const journal = PersistentJournal.open(new FileSink(logPath));
-  // Registering a threshold is idempotent in effect but versioned in the log,
-  // so it is only set when the action has none. Re-setting it every run would
-  // produce a new version per run and split the calibration into useless
-  // single-decision cohorts.
-  try {
-    journal.thresholdFor(PROMOTION_ACTION);
-  } catch {
-    journal.setThreshold(
-      PROMOTION_ACTION, 0.7, "hunt_once.ts",
-      "initial paper-run threshold; not yet validated against any outcome",
-    );
-    console.log(`threshold  registered tau=0.7 for ${PROMOTION_ACTION}`);
+  // Thresholds are registered once per action. Re-setting one every run would
+  // create a new version per run and split calibration into single-decision
+  // cohorts.
+  for (const action of Object.values(ARM_ACTIONS)) {
+    try {
+      journal.thresholdFor(action);
+    } catch {
+      journal.setThreshold(action, 0.7, "hunt_once.ts",
+        "paper-run threshold for permutation-brier-v1; not validated against outcomes");
+      console.log(`threshold  registered tau=0.7 for ${action}`);
+    }
   }
 
-  // ONE DECISION PER WALLET, EVER. A whale seen every hour would otherwise
-  // become twenty correlated samples of the same prediction, and the 97-outcome
-  // minimum is derived assuming independent ones -- n would be inflated and
-  // the confidence interval would be a fiction.
+  // ONE DECISION PER WALLET, EVER, across every wallet_promotion action --
+  // including the legacy un-suffixed one. A whale seen hourly would otherwise
+  // be twenty correlated samples, and n = 97 assumes independent ones.
   const seen = new Set(
-    journal.all(PROMOTION_ACTION).map((r) => r.answer.split(":")[0]),
+    journal.all()
+      .filter((r) => r.action === PROMOTION_ACTION || r.action.startsWith(`${PROMOTION_ACTION}@`))
+      .map((r) => r.answer.split(":")[0]),
   );
   const fresh = observations.filter((o) => !seen.has(o.address));
   if (fresh.length < observations.length) {
     console.log(`skipped    ${observations.length - fresh.length} wallet(s) already journalled`);
   }
 
+  // Jev arms are OPT-IN (--jev), never inferred from a key being present:
+  // GitHub Actions must stay heuristic-only (no model key on GitHub, user
+  // decision 2026-09-23), and a key that happens to be in some environment
+  // must not silently change what a run records. `pnpm jev:local` passes
+  // --jev and points at a separate journal.
+  const wantJev = parsed.booleans.has("jev");
+  if (wantJev && !process.env.OPENROUTER_API_KEY) {
+    console.error("--jev needs OPENROUTER_API_KEY in this machine's environment; refusing");
+    return 2;
+  }
+  const jev = wantJev ? new JevHttpEngine({ getKey: () => process.env.OPENROUTER_API_KEY }) : null;
+  if (!jev) console.log("jev        off (heuristic arm only)");
+  const reader = new RpcChainReader(httpJsonRpc(ENDPOINT));
+  const head = jev ? await reader.head() : null;
+
+  const gates = (address: string) => ({
+    hasValidAddress: /^0x[0-9a-f]{40}$/.test(address),
+    hasAtLeastOneSource: true,
+    hasProfileAndSecurityFeatures: false,
+    meetsWatchMinScore: false,
+    isNotSybil: false,
+    isConfirmedByHumanOrAutoPromote: false,
+  });
+
   let recorded = 0;
+  let jevPairs = 0;
+  let jevFailures = 0;
   for (const o of fresh) {
     const native = (o.raw as { nativeValue: number }).nativeValue;
-    const out = promote(
-      journal,
-      {
-        walletId: o.address,
-        from: "watchlisted",
-        to: "trusted",
-        confidence: confidenceFromValue(native, minValue),
-        gates: {
-          hasValidAddress: /^0x[0-9a-f]{40}$/.test(o.address),
-          hasAtLeastOneSource: true,
-          hasProfileAndSecurityFeatures: false,
-          meetsWatchMinScore: false,
-          isNotSybil: false,
-          isConfirmedByHumanOrAutoPromote: false,
-        },
-        note: `${o.source} ${native} PLS @ ${o.observedAt}`,
-      },
-      { baseline: 0.5 },
-    );
-    recorded += 1;
-    if (recorded <= 3) {
-      console.log(`  ${o.address}  ${out.decisionId}  allowed=${out.allowed}`);
+    const note = `${o.source} ${native} PLS @ ${o.observedAt}`;
+    const record = (action: string, confidence: number) => {
+      promote(journal, { walletId: o.address, from: "watchlisted", to: "trusted",
+        confidence, gates: gates(o.address), note }, { baseline: 0.5 }, action);
+      recorded += 1;
+    };
+
+    // Jev FIRST, so the pair is only recorded if both halves exist. A failed
+    // call records neither Jev arm -- never a single without its twin.
+    let pair: { single: number; permuted: number } | null = null;
+    if (jev && head) {
+      try {
+        const balance = Number((await reader.balanceAt(o.address, head.number)) / 10n ** 12n) / 1e6;
+        pair = await jevForecasts(jev, features(native, balance));
+      } catch (e) {
+        jevFailures += 1;
+        console.log(`  ${o.address}  jev skipped: ${(e as Error).message}`);
+      }
+    }
+    record(ARM_ACTIONS.heuristic, confidenceFromValue(native, minValue));
+    if (pair) {
+      record(ARM_ACTIONS.single, pair.single);
+      record(ARM_ACTIONS.permuted, pair.permuted);
+      jevPairs += 1;
+      if (jevPairs <= 3) {
+        console.log(`  ${o.address}  single ${pair.single.toFixed(3)}  permuted ${pair.permuted.toFixed(3)}`);
+      }
     }
   }
+  if (jev) console.log(`jev        ${jevPairs} paired forecast(s), ${jevFailures} failure(s)`);
 
   console.log(`journalled ${recorded} decision(s) -> ${logPath}`);
   console.log("Run `pnpm paper:status` to see the clock.");

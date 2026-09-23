@@ -7,8 +7,11 @@ name: paper-run
 # it is merged to main. Until then, `workflow_dispatch` or `pnpm hunt` /
 # `pnpm resolve` by hand.
 #
-# Hunt plane only. No secret is referenced anywhere in this file: the job
-# reads a public RPC and writes to this repository, nothing else.
+# Hunt plane only. NO SECRET IS REFERENCED, and none may be: no model key
+# lives on GitHub (user decision, 2026-09-23). This job runs the heuristic arm
+# and the resolver. The Jev arms run LOCALLY via `pnpm jev:local`, with the key
+# from the machine running it, into a separate journal
+# (ops/journal/jev-local.jsonl) that this job never touches.
 on:
   schedule:
     - cron: "17 * * * *"   # hourly, off the top of the hour

@@ -38,6 +38,14 @@
     "./resolve/resolver.ts": {
       "types": "./src/resolve/resolver.ts",
       "default": "./src/resolve/resolver.ts"
+    },
+    "./experiment/retentionArms.ts": {
+      "types": "./src/experiment/retentionArms.ts",
+      "default": "./src/experiment/retentionArms.ts"
+    },
+    "./experiment/pairedBrier.ts": {
+      "types": "./src/experiment/pairedBrier.ts",
+      "default": "./src/experiment/pairedBrier.ts"
     }
   },
   "main": "./src/index.ts",

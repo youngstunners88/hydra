@@ -93,8 +93,12 @@ export function promote(
   journal: PromotionJournal,
   request: PromotionRequest,
   policy: PromotionPolicy,
+  /** The journal action. Distinct per confidence kind -- see jev/types.ts
+   *  journalAction(): kinds on different scales must never share a bucket,
+   *  and each action's paperMetricsPassed is judged on its own outcomes. */
+  action: string = PROMOTION_ACTION,
 ): PromotionOutcome {
-  const verdict = journal.paperMetricsPassed(PROMOTION_ACTION, {
+  const verdict = journal.paperMetricsPassed(action, {
     baseline: policy.baseline,
     margin: policy.margin,
     minResolved: policy.minResolved,
@@ -104,7 +108,7 @@ export function promote(
   // prediction that the wallet was not ready, and it belongs in the
   // calibration set exactly as much as an accepted one does.
   const record = journal.record(
-    PROMOTION_ACTION,
+    action,
     `${request.walletId}:${request.from}->${request.to}`,
     request.confidence,
     request.note ?? "",
