@@ -12,7 +12,7 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "doctor": "bash scripts/doctor.sh",
-    "hunt": "tsx scripts/hunt_once.ts",
+    "hunt": "node --experimental-strip-types scripts/hunt_once.ts",
     "promote": "tsx scripts/promote_wallet.ts",
     "replay": "tsx scripts/paper_copy_replay.ts",
     "smoke": "tsx scripts/smoke_dust_swap.ts",

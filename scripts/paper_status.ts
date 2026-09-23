@@ -11,18 +11,25 @@
  * timestamp of the earliest decision is evidence that one did.
  */
 import { FileSink, PersistentJournal, paperRunStatus } from "../packages/risk/src/journalStore.ts";
+import { numberFlag, parseArgs } from "../packages/risk/src/cliArgs.ts";
 import { MIN_RESOLVED_FOR_VERDICT } from "../packages/risk/src/journal.ts";
 import { PROMOTION_ACTION } from "../packages/hunter/src/promotion.ts";
 
 const DEFAULT_LOG = "ops/journal/decisions.jsonl";
 
 function main(argv: string[]): number {
-  const positional = argv.filter((a) => !a.startsWith("--"));
-  const path = positional[0] ?? DEFAULT_LOG;
-  const daysFlag = argv.indexOf("--days");
-  const requiredDays = daysFlag === -1 ? 30 : Number(argv[daysFlag + 1]);
-  if (!Number.isFinite(requiredDays) || requiredDays <= 0) {
-    console.error(`--days must be a positive number; got ${argv[daysFlag + 1]}`);
+  let path: string;
+  let requiredDays: number;
+  try {
+    const parsed = parseArgs(argv, { withValue: ["days"] });
+    path = parsed.positional[0] ?? DEFAULT_LOG;
+    requiredDays = numberFlag(parsed, "days", 30);
+  } catch (e) {
+    console.error((e as Error).message);
+    return 2;
+  }
+  if (requiredDays <= 0) {
+    console.error(`--days must be positive; got ${requiredDays}`);
     return 2;
   }
 

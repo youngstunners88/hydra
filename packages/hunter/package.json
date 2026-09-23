@@ -9,9 +9,34 @@
   },
   "dependencies": {
     "@hydra/core": "workspace:*",
-    "@hydra/intel": "workspace:*"
+    "@hydra/intel": "workspace:*",
+    "@hydra/risk": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
-  }
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./lifecycle.ts": {
+      "types": "./src/lifecycle.ts",
+      "default": "./src/lifecycle.ts"
+    },
+    "./promotion.ts": {
+      "types": "./src/promotion.ts",
+      "default": "./src/promotion.ts"
+    },
+    "./ports.ts": {
+      "types": "./src/ports.ts",
+      "default": "./src/ports.ts"
+    },
+    "./sources/rpcHunter.ts": {
+      "types": "./src/sources/rpcHunter.ts",
+      "default": "./src/sources/rpcHunter.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
 }

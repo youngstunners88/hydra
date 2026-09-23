@@ -54,6 +54,9 @@ importers:
       '@hydra/intel':
         specifier: workspace:*
         version: link:../intel
+      '@hydra/risk':
+        specifier: workspace:*
+        version: link:../risk
     devDependencies:
       typescript:
         specifier: ^5.5.0

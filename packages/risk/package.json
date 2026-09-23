@@ -12,5 +12,37 @@
   },
   "devDependencies": {
     "typescript": "^5.5.0"
-  }
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./journal.ts": {
+      "types": "./src/journal.ts",
+      "default": "./src/journal.ts"
+    },
+    "./journalStore.ts": {
+      "types": "./src/journalStore.ts",
+      "default": "./src/journalStore.ts"
+    },
+    "./planeGuard.ts": {
+      "types": "./src/planeGuard.ts",
+      "default": "./src/planeGuard.ts"
+    },
+    "./ratchet.ts": {
+      "types": "./src/ratchet.ts",
+      "default": "./src/ratchet.ts"
+    },
+    "./coverage.ts": {
+      "types": "./src/coverage.ts",
+      "default": "./src/coverage.ts"
+    },
+    "./ports.ts": {
+      "types": "./src/ports.ts",
+      "default": "./src/ports.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
 }
