@@ -1,4 +1,4 @@
-# DRAFT — noul-retention-v2 (NOT SEALED)
+# SEALED 2026-09-24 as ops/experiments/noul-retention-v2.json -- the JSON text governs; this draft is history
 
 Status: draft only. Nothing here is hashed, nothing is wired, no arm runs.
 Sealing needs the owner's yes. `permutation-brier-v1` is untouched and keeps
