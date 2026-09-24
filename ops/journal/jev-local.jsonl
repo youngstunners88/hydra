@@ -401,3 +401,118 @@
 {"kind":"decision","record":{"id":"d248","action":"wallet_promotion@heuristic","answer":"0x1b8f540fd3cb6681e6d5348c1adc1f6f7dea794d:watchlisted->trusted","confidence":0.6784,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790200427239,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 3037882.445881 PLS @ 2026-09-23T21:50:25.000Z"}}
 {"kind":"decision","record":{"id":"d249","action":"wallet_promotion@single","answer":"0x1b8f540fd3cb6681e6d5348c1adc1f6f7dea794d:watchlisted->trusted","confidence":0.34,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790200427239,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 3037882.445881 PLS @ 2026-09-23T21:50:25.000Z"}}
 {"kind":"decision","record":{"id":"d250","action":"wallet_promotion@permuted","answer":"0x1b8f540fd3cb6681e6d5348c1adc1f6f7dea794d:watchlisted->trusted","confidence":0.39,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790200427239,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 3037882.445881 PLS @ 2026-09-23T21:50:25.000Z"}}
+{"kind":"outcome","id":"d151","outcome":false,"outcomeAt":1790226691306}
+{"kind":"outcome","id":"d154","outcome":false,"outcomeAt":1790226691621}
+{"kind":"outcome","id":"d157","outcome":false,"outcomeAt":1790226691960}
+{"kind":"outcome","id":"d160","outcome":true,"outcomeAt":1790226692416}
+{"kind":"outcome","id":"d163","outcome":false,"outcomeAt":1790226692774}
+{"kind":"outcome","id":"d166","outcome":true,"outcomeAt":1790226693081}
+{"kind":"outcome","id":"d169","outcome":false,"outcomeAt":1790226693412}
+{"kind":"outcome","id":"d172","outcome":true,"outcomeAt":1790226693742}
+{"kind":"outcome","id":"d175","outcome":false,"outcomeAt":1790226694070}
+{"kind":"outcome","id":"d178","outcome":true,"outcomeAt":1790226694398}
+{"kind":"outcome","id":"d181","outcome":true,"outcomeAt":1790226694693}
+{"kind":"outcome","id":"d184","outcome":true,"outcomeAt":1790226695023}
+{"kind":"outcome","id":"d187","outcome":false,"outcomeAt":1790226695419}
+{"kind":"outcome","id":"d190","outcome":true,"outcomeAt":1790226699271}
+{"kind":"outcome","id":"d193","outcome":false,"outcomeAt":1790226699564}
+{"kind":"outcome","id":"d196","outcome":false,"outcomeAt":1790226699949}
+{"kind":"outcome","id":"d197","outcome":false,"outcomeAt":1790226700241}
+{"kind":"outcome","id":"d200","outcome":true,"outcomeAt":1790226700569}
+{"kind":"outcome","id":"d203","outcome":true,"outcomeAt":1790226700929}
+{"kind":"outcome","id":"d206","outcome":false,"outcomeAt":1790226701222}
+{"kind":"outcome","id":"d209","outcome":true,"outcomeAt":1790226704724}
+{"kind":"outcome","id":"d212","outcome":true,"outcomeAt":1790226705015}
+{"kind":"outcome","id":"d215","outcome":false,"outcomeAt":1790226705343}
+{"kind":"outcome","id":"d218","outcome":false,"outcomeAt":1790226705671}
+{"kind":"outcome","id":"d221","outcome":false,"outcomeAt":1790226705963}
+{"kind":"outcome","id":"d224","outcome":false,"outcomeAt":1790226706256}
+{"kind":"outcome","id":"d227","outcome":true,"outcomeAt":1790226706551}
+{"kind":"outcome","id":"d230","outcome":false,"outcomeAt":1790226706843}
+{"kind":"outcome","id":"d233","outcome":false,"outcomeAt":1790226707867}
+{"kind":"outcome","id":"d236","outcome":false,"outcomeAt":1790226708229}
+{"kind":"outcome","id":"d239","outcome":true,"outcomeAt":1790226708557}
+{"kind":"outcome","id":"d242","outcome":true,"outcomeAt":1790226708850}
+{"kind":"outcome","id":"d245","outcome":true,"outcomeAt":1790226709216}
+{"kind":"outcome","id":"d248","outcome":true,"outcomeAt":1790226709546}
+{"kind":"outcome","id":"d153","outcome":false,"outcomeAt":1790226714736}
+{"kind":"outcome","id":"d156","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d159","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d162","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d165","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d168","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d171","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d174","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d177","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d180","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d183","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d186","outcome":true,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d189","outcome":false,"outcomeAt":1790226714737}
+{"kind":"outcome","id":"d192","outcome":true,"outcomeAt":1790226717128}
+{"kind":"outcome","id":"d195","outcome":false,"outcomeAt":1790226717128}
+{"kind":"outcome","id":"d199","outcome":false,"outcomeAt":1790226717128}
+{"kind":"outcome","id":"d202","outcome":true,"outcomeAt":1790226717129}
+{"kind":"outcome","id":"d205","outcome":true,"outcomeAt":1790226717129}
+{"kind":"outcome","id":"d208","outcome":false,"outcomeAt":1790226717129}
+{"kind":"outcome","id":"d211","outcome":true,"outcomeAt":1790226718714}
+{"kind":"outcome","id":"d214","outcome":true,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d217","outcome":false,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d220","outcome":false,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d223","outcome":false,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d226","outcome":false,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d229","outcome":true,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d232","outcome":false,"outcomeAt":1790226718715}
+{"kind":"outcome","id":"d235","outcome":false,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d238","outcome":false,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d241","outcome":true,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d244","outcome":true,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d247","outcome":true,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d250","outcome":true,"outcomeAt":1790226718867}
+{"kind":"outcome","id":"d152","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d155","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d158","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d161","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d164","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d167","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d170","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d173","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d176","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d179","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d182","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d185","outcome":true,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d188","outcome":false,"outcomeAt":1790226724488}
+{"kind":"outcome","id":"d191","outcome":true,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d194","outcome":false,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d198","outcome":false,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d201","outcome":true,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d204","outcome":true,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d207","outcome":false,"outcomeAt":1790226727160}
+{"kind":"outcome","id":"d210","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d213","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d216","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d219","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d222","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d225","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d228","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d231","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d234","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d237","outcome":false,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d240","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d243","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d246","outcome":true,"outcomeAt":1790226728927}
+{"kind":"outcome","id":"d249","outcome":true,"outcomeAt":1790226728927}
+{"kind":"decision","record":{"id":"d251","action":"wallet_promotion@heuristic","answer":"0xb9f710b6f9fe942ef3f2e99bff2f7841f2391e8b:watchlisted->trusted","confidence":0.5562,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226734865,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 182322.790816 PLS @ 2026-09-24T05:11:25.000Z"}}
+{"kind":"decision","record":{"id":"d252","action":"wallet_promotion@single","answer":"0xb9f710b6f9fe942ef3f2e99bff2f7841f2391e8b:watchlisted->trusted","confidence":0.06,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226734865,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 182322.790816 PLS @ 2026-09-24T05:11:25.000Z"}}
+{"kind":"decision","record":{"id":"d253","action":"wallet_promotion@permuted","answer":"0xb9f710b6f9fe942ef3f2e99bff2f7841f2391e8b:watchlisted->trusted","confidence":0.105,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226734865,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 182322.790816 PLS @ 2026-09-24T05:11:25.000Z"}}
+{"kind":"decision","record":{"id":"d254","action":"wallet_promotion@heuristic","answer":"0xb40f1ac813d2d04ada0d7409ce84d5ac2b33be4c:watchlisted->trusted","confidence":0.71,"route":"auto","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735224,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 6298451.246437 PLS @ 2026-09-24T05:10:55.000Z"}}
+{"kind":"decision","record":{"id":"d255","action":"wallet_promotion@single","answer":"0xb40f1ac813d2d04ada0d7409ce84d5ac2b33be4c:watchlisted->trusted","confidence":0.07,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735224,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 6298451.246437 PLS @ 2026-09-24T05:10:55.000Z"}}
+{"kind":"decision","record":{"id":"d256","action":"wallet_promotion@permuted","answer":"0xb40f1ac813d2d04ada0d7409ce84d5ac2b33be4c:watchlisted->trusted","confidence":0.125,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735224,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 6298451.246437 PLS @ 2026-09-24T05:10:55.000Z"}}
+{"kind":"decision","record":{"id":"d257","action":"wallet_promotion@heuristic","answer":"0x4991815bef7c83326e14a6691efc5501d9d1cd1b:watchlisted->trusted","confidence":0.5343,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735671,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 110134.062413 PLS @ 2026-09-24T05:10:15.000Z"}}
+{"kind":"decision","record":{"id":"d258","action":"wallet_promotion@single","answer":"0x4991815bef7c83326e14a6691efc5501d9d1cd1b:watchlisted->trusted","confidence":0.08,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735671,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 110134.062413 PLS @ 2026-09-24T05:10:15.000Z"}}
+{"kind":"decision","record":{"id":"d259","action":"wallet_promotion@permuted","answer":"0x4991815bef7c83326e14a6691efc5501d9d1cd1b:watchlisted->trusted","confidence":0.17,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735671,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 110134.062413 PLS @ 2026-09-24T05:10:15.000Z"}}
+{"kind":"decision","record":{"id":"d260","action":"wallet_promotion@heuristic","answer":"0xacfe70594cb8f09bb8403724d6eba5cd6656868a:watchlisted->trusted","confidence":0.8255,"route":"auto","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735991,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 90000000 PLS @ 2026-09-24T05:09:55.000Z"}}
+{"kind":"decision","record":{"id":"d261","action":"wallet_promotion@single","answer":"0xacfe70594cb8f09bb8403724d6eba5cd6656868a:watchlisted->trusted","confidence":0.22,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735991,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 90000000 PLS @ 2026-09-24T05:09:55.000Z"}}
+{"kind":"decision","record":{"id":"d262","action":"wallet_promotion@permuted","answer":"0xacfe70594cb8f09bb8403724d6eba5cd6656868a:watchlisted->trusted","confidence":0.33,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226735991,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 90000000 PLS @ 2026-09-24T05:09:55.000Z"}}
+{"kind":"decision","record":{"id":"d263","action":"wallet_promotion@heuristic","answer":"0xaeb07c82b6e202393c6c8d7fbd3ea97d8ecfe397:watchlisted->trusted","confidence":0.5696,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226736315,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 248421.683792 PLS @ 2026-09-24T05:09:15.000Z"}}
+{"kind":"decision","record":{"id":"d264","action":"wallet_promotion@single","answer":"0xaeb07c82b6e202393c6c8d7fbd3ea97d8ecfe397:watchlisted->trusted","confidence":0.09,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226736315,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 248421.683792 PLS @ 2026-09-24T05:09:15.000Z"}}
+{"kind":"decision","record":{"id":"d265","action":"wallet_promotion@permuted","answer":"0xaeb07c82b6e202393c6c8d7fbd3ea97d8ecfe397:watchlisted->trusted","confidence":0.18,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790226736315,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 248421.683792 PLS @ 2026-09-24T05:09:15.000Z"}}
