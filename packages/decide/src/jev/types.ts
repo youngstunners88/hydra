@@ -54,7 +54,10 @@ export type Question = ChoiceQuestion | ProbabilityQuestion;
  * calls and not others. Put thresholds away from where an engine's answers
  * cluster, or accept that the gate is a coin flip in that band.
  */
-export type ConfidenceKind = "single" | "permuted" | "heuristic";
+export type ConfidenceKind = "single" | "permuted" | "heuristic" | "noul" | "constant";
+// noul       Jev's Noul probability that a statement is true: a probability
+//            by construction, NOT a sharpened Choice (noul-retention-v2)
+// constant   a fixed number, recorded so a baseline lives in the journal
 
 export interface ChoiceVerdict {
   readonly question: string;

@@ -71,7 +71,7 @@ unchanged. Source: `tradecc/CLAUDE.md`.
   `ops/experiments/*.json` are hash-checked on every run. A new rule means a
   new id AND a new journal action, sealed before its first outcome.
 - **97 resolved outcomes per action, never pooled.** Confidence kinds
-  (`@heuristic`, `@single`, `@permuted`) are on different scales.
+  (`@heuristic`, `@single`, `@permuted`, `@noul`, `@constant`) are on different scales.
 - **No live trading until the TradeCC gate passes.** Paper/hunt only.
 
 ## 5. Working rules
