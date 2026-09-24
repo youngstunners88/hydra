@@ -15,7 +15,7 @@
  * sits ~0.1 below the top probability.
  */
 import { journalAction, DecisionError } from "../jev/types.ts";
-import type { ChoiceQuestion, ChoiceVerdict } from "../jev/types.ts";
+import type { ChoiceQuestion, ChoiceVerdict, ProbabilityQuestion, ProbabilityVerdict } from "../jev/types.ts";
 import type { DecisionEngine } from "../jev/port.ts";
 import { CapturingEngine } from "../jev/adapters/capture.ts";
 import { PermutedEngine } from "../jev/adapters/permuted.ts";
@@ -101,4 +101,41 @@ export async function jevForecasts(
     single: canonical.probabilities.retains as number,
     permuted: agg.probabilities.retains as number,
   };
+}
+
+// --- noul-retention-v2 (ops/experiments/noul-retention-v2.json) ----------------
+
+/** v2's own arms. `permuted` is v1's arm, reused as-is from the same hunt. */
+export const V2_ACTIONS = {
+  noul: journalAction(PROMOTION_ACTION, "noul"),
+  constant: journalAction(PROMOTION_ACTION, "constant"),
+} as const;
+
+/** Sealed value of the constant arm. */
+export const V2_CONSTANT = 0.5;
+
+/**
+ * Verbatim from the seal. A test checks the sealed text contains this exact
+ * statement, so an edit here fails CI rather than silently changing the arm.
+ * `true` means RETAINS -- the same direction as the rule's CORRECT line.
+ */
+export const RETAIN_NOUL: ProbabilityQuestion = {
+  kind: "probability",
+  name: "retain_noul",
+  statement:
+    "Six hours after the transfer described, the sending wallet's native PLS " +
+    "balance is at least what it was at the time of the transfer.",
+};
+
+/**
+ * Jev's Noul P(retains), in a request SEPARATE from v1's so v1's sealed
+ * request is unchanged. Same egress, same state.
+ */
+export async function jevNoul(jev: DecisionEngine, f: RetentionFeatures): Promise<number> {
+  const state = RETAIN_EGRESS.apply({ ...f }).state;
+  const [v] = (await jev.decide(state, [RETAIN_NOUL])) as ProbabilityVerdict[];
+  if (!v || v.kind !== "probability" || !(v.probability >= 0 && v.probability <= 1)) {
+    throw new DecisionError("Jev returned no Noul probability; no v2 arm recorded");
+  }
+  return v.probability;
 }

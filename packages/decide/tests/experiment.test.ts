@@ -9,9 +9,10 @@ import { CapturingEngine } from "../src/jev/adapters/capture.ts";
 import type { DecisionState } from "../src/jev/port.ts";
 import type { Question } from "../src/jev/types.ts";
 import {
-  ARM_ACTIONS, RETAIN_QUESTION, confidenceFromValue, features, jevForecasts,
+  ARM_ACTIONS, RETAIN_QUESTION, RETAIN_NOUL, V2_ACTIONS, V2_CONSTANT,
+  confidenceFromValue, features, jevForecasts, jevNoul,
 } from "../src/experiment/retentionArms.ts";
-import { pairedBrier, SEALED_MINIMUM, SEALED_THRESHOLD } from "../src/experiment/pairedBrier.ts";
+import { pairedBrier, tripleBrier, SEALED_MINIMUM, SEALED_THRESHOLD } from "../src/experiment/pairedBrier.ts";
 import { CachedChainReader } from "../src/resolve/chain.ts";
 import type { BlockHeader, ChainReader } from "../src/resolve/chain.ts";
 
@@ -196,5 +197,63 @@ describe("CachedChainReader", () => {
     await new Promise((res) => setImmediate(res));
     assert.equal(await c.balanceAt("0xa", 1), 5n);
     assert.equal(calls.balance, 2);
+  });
+});
+
+describe("noul-retention-v2", () => {
+  const seal = JSON.parse(readFileSync("ops/experiments/noul-retention-v2.json", "utf8"));
+
+  it("the seal still matches its text, sealed before any data", () => {
+    assert.equal(createHash("sha256").update(seal.text).digest("hex"), seal.sha256);
+    assert.equal(seal.paired_resolved_at_seal, 0);
+  });
+
+  it("the code asks the sealed statement verbatim, and records the sealed constant", () => {
+    assert.ok(seal.text.includes(`"${RETAIN_NOUL.statement}"`), "Noul statement drifted from the seal");
+    assert.ok(seal.text.includes(`wallet_promotion@constant  ${V2_CONSTANT}`));
+    assert.equal(V2_ACTIONS.noul, "wallet_promotion@noul");
+    assert.equal(V2_ACTIONS.constant, "wallet_promotion@constant");
+  });
+
+  it("sends the Noul alone, with the same three-number egress as v1", async () => {
+    const seen: { state: DecisionState; questions: readonly Question[] }[] = [];
+    const e = new ScriptedEngine("s", () => ({ kind: "probability", probability: 0.6, confidenceKind: "single" }));
+    const spy = { id: "spy", remote: false, decide: async (state: DecisionState, questions: readonly Question[]) => {
+      seen.push({ state, questions }); return e.decide(state, questions); } };
+    assert.equal(await jevNoul(spy, features(10, 30)), 0.6);
+    assert.equal(seen.length, 1);
+    assert.deepEqual(seen[0]!.questions.map((q) => q.name), ["retain_noul"]);
+    assert.deepEqual(Object.keys(seen[0]!.state).sort(), ["balance_pls", "fraction_sent", "value_pls"]);
+  });
+
+  it("refuses a Choice where a Noul was asked", async () => {
+    const wrong = new ScriptedEngine("s", () => ({ kind: "choice", choice: "a", confidence: 1,
+      probabilities: { a: 1 }, confidenceKind: "single" }));
+    await assert.rejects(() => jevNoul(wrong, features(1, 1)), /no Noul probability/);
+  });
+
+  const row = (w: number, confidence: number, outcome: boolean | null) =>
+    ({ answer: `0x${String(w).padStart(40, "0")}:watchlisted->trusted`, confidence, outcome });
+  const arms = (n: number, pn: number, pp: number, out = (i: number) => i % 2 === 0) => {
+    const r = (p: number) => Array.from({ length: n }, (_, i) => row(i, out(i) ? p : 1 - p, out(i)));
+    return [r(pn), r(pp), Array.from({ length: n }, (_, i) => row(i, V2_CONSTANT, out(i)))] as const;
+  };
+
+  it("UNDERPOWERED below the minimum, whatever the numbers", () => {
+    assert.equal(tripleBrier(...arms(SEALED_MINIMUM - 1, 0.95, 0.1)).verdict, "UNDERPOWERED");
+  });
+  it("HELD only when noul beats permuted by the threshold AND beats the constant", () => {
+    assert.equal(tripleBrier(...arms(SEALED_MINIMUM, 0.8, 0.3)).verdict, "HELD");
+  });
+  it("FALSIFIED when noul beats permuted but not the coin", () => {
+    // noul p=0.45 on the true side: Brier 0.3025 > 0.25; permuted worse still.
+    const t = tripleBrier(...arms(SEALED_MINIMUM, 0.45, 0.2));
+    assert.ok(t.noul <= t.permuted - SEALED_THRESHOLD && t.noul > t.constant);
+    assert.equal(t.verdict, "FALSIFIED");
+  });
+  it("pairs only wallets present and resolved in all three arms", () => {
+    const [n, p, c] = arms(10, 0.8, 0.3);
+    const t = tripleBrier([...n, row(99, 0.9, true)], p, c.slice(0, 5).concat([row(5, 0.5, null)]));
+    assert.equal(t.pairs, 5);
   });
 });

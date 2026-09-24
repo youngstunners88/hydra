@@ -38,7 +38,7 @@
 import { PersistentJournal, FileSink } from "../packages/risk/src/journalStore.ts";
 import { promote, PROMOTION_ACTION } from "../packages/decide/src/promotion.ts";
 import {
-  ARM_ACTIONS, confidenceFromValue, features, jevForecasts,
+  ARM_ACTIONS, V2_ACTIONS, V2_CONSTANT, confidenceFromValue, features, jevForecasts, jevNoul,
 } from "../packages/decide/src/experiment/retentionArms.ts";
 import { JevHttpEngine } from "../packages/decide/src/jev/adapters/jevHttp.ts";
 import { RpcHunter, httpJsonRpc } from "../packages/hunter/src/sources/rpcHunter.ts";
@@ -101,7 +101,7 @@ async function main(argv: string[]): Promise<number> {
   // Thresholds are registered once per action. Re-setting one every run would
   // create a new version per run and split calibration into single-decision
   // cohorts.
-  for (const action of Object.values(ARM_ACTIONS)) {
+  for (const action of [...Object.values(ARM_ACTIONS), ...Object.values(V2_ACTIONS)]) {
     try {
       journal.thresholdFor(action);
     } catch {
@@ -151,6 +151,7 @@ async function main(argv: string[]): Promise<number> {
   let recorded = 0;
   let jevPairs = 0;
   let jevFailures = 0;
+  let jevNouls = 0;
   for (const o of fresh) {
     const native = (o.raw as { nativeValue: number }).nativeValue;
     const note = `${o.source} ${native} PLS @ ${o.observedAt}`;
@@ -163,10 +164,20 @@ async function main(argv: string[]): Promise<number> {
     // Jev FIRST, so the pair is only recorded if both halves exist. A failed
     // call records neither Jev arm -- never a single without its twin.
     let pair: { single: number; permuted: number } | null = null;
+    let noul: number | null = null;
     if (jev && head) {
       try {
         const balance = Number((await reader.balanceAt(o.address, head.number)) / 10n ** 12n) / 1e6;
-        pair = await jevForecasts(jev, features(native, balance));
+        const f = features(native, balance);
+        pair = await jevForecasts(jev, f);
+        // noul-retention-v2: a separate request, only after the v1 pair
+        // succeeded. A failure here costs v2 this wallet, never v1.
+        try {
+          noul = await jevNoul(jev, f);
+        } catch (e) {
+          jevFailures += 1;
+          console.log(`  ${o.address}  noul skipped: ${(e as Error).message}`);
+        }
       } catch (e) {
         jevFailures += 1;
         console.log(`  ${o.address}  jev skipped: ${(e as Error).message}`);
@@ -177,12 +188,17 @@ async function main(argv: string[]): Promise<number> {
       record(ARM_ACTIONS.single, pair.single);
       record(ARM_ACTIONS.permuted, pair.permuted);
       jevPairs += 1;
+      if (noul !== null) {
+        record(V2_ACTIONS.noul, noul);
+        record(V2_ACTIONS.constant, V2_CONSTANT);
+        jevNouls += 1;
+      }
       if (jevPairs <= 3) {
         console.log(`  ${o.address}  single ${pair.single.toFixed(3)}  permuted ${pair.permuted.toFixed(3)}`);
       }
     }
   }
-  if (jev) console.log(`jev        ${jevPairs} paired forecast(s), ${jevFailures} failure(s)`);
+  if (jev) console.log(`jev        ${jevPairs} paired forecast(s), ${jevNouls} noul, ${jevFailures} failure(s)`);
 
   console.log(`journalled ${recorded} decision(s) -> ${logPath}`);
   console.log("Run `pnpm paper:status` to see the clock.");

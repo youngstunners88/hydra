@@ -78,3 +78,61 @@ export function pairedBrier(
     : improvement >= threshold ? "HELD" : "FALSIFIED";
   return { pairs: n, brierA, brierB, improvement, verdict, minimum, threshold };
 }
+
+// --- noul-retention-v2 -------------------------------------------------------
+
+export interface TripleBrier {
+  readonly pairs: number;
+  readonly noul: number;
+  readonly permuted: number;
+  readonly constant: number;
+  readonly verdict: ExperimentVerdict;
+  readonly minimum: number;
+  readonly threshold: number;
+}
+
+/**
+ * Grade noul-retention-v2 as sealed: wallets resolved in ALL THREE arms.
+ * HELD iff Brier(noul) <= Brier(permuted) - threshold AND
+ * Brier(noul) < Brier(constant). Below the minimum: UNDERPOWERED.
+ */
+export function tripleBrier(
+  noul: readonly ArmRecord[],
+  permuted: readonly ArmRecord[],
+  constant: readonly ArmRecord[],
+  minimum: number = SEALED_MINIMUM,
+  threshold: number = SEALED_THRESHOLD,
+): TripleBrier {
+  const index = (rows: readonly ArmRecord[], arm: string) => {
+    const m = new Map<string, ArmRecord>();
+    for (const r of rows) {
+      const w = walletOf(r.answer);
+      if (m.has(w)) throw new Error(`${arm}: wallet ${w} recorded twice; one decision per wallet broke`);
+      m.set(w, r);
+    }
+    return m;
+  };
+  const [iN, iP, iC] = [index(noul, "noul"), index(permuted, "permuted"), index(constant, "constant")];
+  let n = 0;
+  let sn = 0;
+  let sp = 0;
+  let sc = 0;
+  for (const [w, rn] of iN) {
+    const rp = iP.get(w);
+    const rc = iC.get(w);
+    if (!rp || !rc || rn.outcome === null || rp.outcome === null || rc.outcome === null) continue;
+    if (rn.outcome !== rp.outcome || rn.outcome !== rc.outcome) {
+      throw new Error(`wallet ${w}: arms resolved to different outcomes`);
+    }
+    const y = rn.outcome ? 1 : 0;
+    sn += (rn.confidence - y) ** 2;
+    sp += (rp.confidence - y) ** 2;
+    sc += (rc.confidence - y) ** 2;
+    n += 1;
+  }
+  const mean = (x: number) => (n ? x / n : Number.NaN);
+  const [bn, bp, bc] = [mean(sn), mean(sp), mean(sc)];
+  const verdict: ExperimentVerdict = n < minimum ? "UNDERPOWERED"
+    : bn <= bp - threshold && bn < bc ? "HELD" : "FALSIFIED";
+  return { pairs: n, noul: bn, permuted: bp, constant: bc, verdict, minimum, threshold };
+}
