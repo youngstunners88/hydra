@@ -10,6 +10,13 @@
  * looks like key material is a hard refusal, not a drop: 64 hex chars (a raw
  * private key), a BIP-39-length word run, or a PEM block. Hydra's CI already
  * refuses these in the repo; this refuses them on the wire.
+ *
+ * Service credentials are refused the same way: an API token (OpenRouter
+ * `sk-or-...`, TypeSafe `apikey_`/`ts_live_`, GitHub, Slack, Google), a JWT,
+ * a Bearer header, or `scheme://user:password@`. The key that pays for the
+ * call must never ride inside the state it pays for. Token shapes adapted
+ * from RevocGG/typesafe-jev-bridge lib/redact.cjs (MIT); refused, not
+ * redacted, because a redacted state is still a state built by a bug.
  */
 import { DecisionError } from "./types.ts";
 import type { DecisionState } from "./port.ts";
@@ -17,6 +24,11 @@ import type { DecisionState } from "./port.ts";
 const PRIVATE_KEY = /(?:^|[^0-9a-fA-F])(?:0x)?[0-9a-fA-F]{64}(?:$|[^0-9a-fA-F])/;
 const PEM = /-----BEGIN [A-Z ]*PRIVATE KEY-----/;
 const MNEMONIC = /^(?:[a-z]{3,8}\s+){11,23}[a-z]{3,8}$/;
+const API_TOKEN =
+  /\b(?:(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,}|apikey_[A-Za-z0-9_-]{16,}|(?:sk|ts|npm|hf)_[A-Za-z0-9_]{10,}|sk-[A-Za-z0-9_-]{16,}|glpat-[A-Za-z0-9_-]{16,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[A-Za-z0-9_-]{30,})/i;
+const JWT = /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{4,}/;
+const BEARER = /\bBearer\s+[A-Za-z0-9._~+/=-]{12,}/i;
+const URL_CREDENTIALS = /\b[a-z][a-z0-9+.-]*:\/\/[^/:\s@]+:[^@/\s]{4,}@/i;
 
 export interface EgressResult {
   readonly state: DecisionState;
@@ -59,6 +71,12 @@ export function assertNoKeyMaterial(value: unknown, path = "state"): void {
       throw new DecisionError(
         `refusing egress: ${path} looks like key material. Nothing shaped like ` +
           "a private key, seed phrase or PEM block leaves the process.",
+      );
+    }
+    if (API_TOKEN.test(value) || JWT.test(value) || BEARER.test(value) || URL_CREDENTIALS.test(value)) {
+      throw new DecisionError(
+        `refusing egress: ${path} looks like a service credential. No API ` +
+          "token, JWT, Bearer header or URL password leaves the process.",
       );
     }
     return;

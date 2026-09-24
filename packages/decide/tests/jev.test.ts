@@ -217,6 +217,27 @@ describe("EgressPolicy", () => {
     const pem = ["-----BEGIN EC", "PRIVATE KEY-----"].join(" ");
     assert.throws(() => assertNoKeyMaterial(pem));
   });
+  // Fixtures assembled at runtime: a literal token in the repo is exactly
+  // what secret scanners exist to flag, fixture or not.
+  const tok = (...parts: string[]) => parts.join("");
+  it("refuses an OpenRouter key inside an allowed key", () => {
+    const k = tok("sk-or-v1-", "0123456789abcdef0123");
+    assert.throws(() => new EgressPolicy(["a"]).apply({ a: `note ${k}` }), /service credential/);
+  });
+  it("refuses TypeSafe, GitHub, JWT, Bearer and URL-password shapes", () => {
+    for (const s of [
+      tok("apikey_", "abcdefghijklmnop1234"),
+      tok("ts_live_", "abcdef123456"),
+      tok("ghp_", "abcdefghijklmnop1234"),
+      tok("eyJ", "hbGciOiJIUzI1", ".", "eyJzdWIiOiIx", ".", "sig_abcd"),
+      tok("Authorization: Bearer ", "abcdefghijklmnop"),
+      tok("https://user:", "hunter22", "@rpc.example"),
+    ]) assert.throws(() => assertNoKeyMaterial({ s }), /service credential/, s.slice(0, 12));
+  });
+  it("passes the numbers and labels the hunter actually sends", () => {
+    assertNoKeyMaterial({ value_pls: 500000, balance_pls: 1.2e6, fraction_sent: 0.41,
+      note: "pulsechain-rpc-value-transfers", url: "https://rpc.pulsechain.com" });
+  });
 });
 
 // --- router ---------------------------------------------------------------------
