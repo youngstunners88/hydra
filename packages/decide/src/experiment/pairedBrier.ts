@@ -114,7 +114,9 @@ export function tripleBrier(
   };
   const [iN, iP, iC] = [index(noul, "noul"), index(permuted, "permuted"), index(constant, "constant")];
   let n = 0;
-  const s = [0, 0, 0];
+  let sn = 0;
+  let sp = 0;
+  let sc = 0;
   for (const [w, rn] of iN) {
     const rp = iP.get(w);
     const rc = iC.get(w);
@@ -123,12 +125,13 @@ export function tripleBrier(
       throw new Error(`wallet ${w}: arms resolved to different outcomes`);
     }
     const y = rn.outcome ? 1 : 0;
-    s[0] += (rn.confidence - y) ** 2;
-    s[1] += (rp.confidence - y) ** 2;
-    s[2] += (rc.confidence - y) ** 2;
+    sn += (rn.confidence - y) ** 2;
+    sp += (rp.confidence - y) ** 2;
+    sc += (rc.confidence - y) ** 2;
     n += 1;
   }
-  const [bn, bp, bc] = s.map((x) => (n ? x / n : Number.NaN)) as [number, number, number];
+  const mean = (x: number) => (n ? x / n : Number.NaN);
+  const [bn, bp, bc] = [mean(sn), mean(sp), mean(sc)];
   const verdict: ExperimentVerdict = n < minimum ? "UNDERPOWERED"
     : bn <= bp - threshold && bn < bc ? "HELD" : "FALSIFIED";
   return { pairs: n, noul: bn, permuted: bp, constant: bc, verdict, minimum, threshold };
