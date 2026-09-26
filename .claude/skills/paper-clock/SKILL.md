@@ -24,7 +24,6 @@ usage: |
   # The four ways a validation clock silently reports zero
   cat 10-Skills/paper-clock/references/failure-modes.md
 ---
-<!-- Vendored from Solomons-Chamber@fe673ca 10-Skills/paper-clock. Edit upstream, then re-vendor. -->
 
 # Paper clock
 
@@ -170,6 +169,31 @@ That does not invalidate the calibration — it *scopes* it. The resulting
 numbers describe recently-active wallets specifically, and writing that down
 before the numbers exist is what stops them being read as something broader
 later.
+
+## Scheduled runs are not a clock (measured 2026-09-23/24)
+
+GitHub's `schedule:` is best-effort. On these repos:
+
+- Hydra's hourly cron fired **twice in ~12h**.
+- tradecc's 2-hourly cron fired **once**, and that run failed.
+- Both workflows were `active` throughout. Nothing was disabled; runs were
+  simply dropped.
+
+What the clock needs instead:
+
+1. **`actions/checkout` with `ref: main`.** A queued run otherwise checks out
+   the SHA from when it was *triggered*. It polls a stale log, then its append
+   conflicts on push. tradecc's 19:47Z run failed exactly this way.
+2. **Coverage is derived, never assumed.** Each poll records how far back its
+   listing reached (`oldest_created_age_h`). A gap is a HOLE when that reach is
+   less than the cutoff plus the hours since the previous poll. Holes are
+   counted, never smoothed over.
+3. **A check-in dispatches when a poll is overdue.** Dispatch at 1.5–2.5h
+   without a poll, well before the gap that would open a hole (~4h for a
+   20h cutoff with a 24h listing). Manual dispatch (`workflow_dispatch`) fires
+   when asked; the schedule may not.
+4. **Report polls and holes every check-in.** A clock with 0 holes over 8 polls
+   is evidence. A clock nobody looked at is not.
 
 ## See also
 

@@ -50,9 +50,31 @@ project's measured failure mode.
 4. **Run it. Grade it.** `grade()` refuses to score anything not sealed first.
 5. **Record the falsification in the artifact**, not just the chat. Struck-through
    or labelled, never deleted.
-6. **Mutation-verify any guard you ship**: break the control, confirm the named
+6. **Before pushing, run CI's own commands** (`ci-parity`), not your
+   paraphrase of them.
+7. **Mutation-verify any guard you ship**: break the control, confirm the named
    test fails. Purge `__pycache__` first — a same-length edit inside one mtime
    second leaves stale bytecode valid and the mutant never runs.
+
+## Binding code to a seal (Hydra noul-retention-v2, 2026-09-24)
+
+A seal on text is worthless if the code can drift from the text. Four mechanics:
+
+1. **Seal in a commit of its own, before the wiring.** The seal JSON holds
+   `sha256` over its text and `paired_resolved_at_seal: 0`. Wiring comes in the
+   next commit. Merge with a **merge commit, not a squash**: a squash folds the
+   seal and the wiring into one commit and erases the proof of order.
+2. **A test asserts the code's constants appear verbatim in the sealed text.**
+   That covers the question wording, the constant arm's value and the action
+   names. Rewording the question in code then fails CI, instead of silently
+   running a different experiment under the old name.
+3. **Mutation-check the grader.** Drop each clause of the sealed prediction in
+   turn (e.g. "AND beats the constant"), and drop the all-arms pairing. Each
+   mutant must fail a named test. v2's grader: 3 of 3 caught.
+4. **Leave the old experiment's inputs byte-identical.** v2's question went in
+   a separate request so v1's sealed request did not change. Adding a question
+   to v1's request would have altered v1 mid-flight, whatever the vendor says
+   about the questions being independent.
 
 ## Checks the code enforces
 
@@ -83,7 +105,6 @@ Nothing is banned. But **"this reads better" is not evidence**, and neither is
 receipt committed.
 
 ---
-<!-- Vendored from Solomons-Chamber@fe673ca 10-Skills/measure-first. Edit upstream, then re-vendor. -->
 
 ## Standing instructions from the user
 
