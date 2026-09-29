@@ -83,8 +83,8 @@ unchanged. Source: `tradecc/CLAUDE.md`.
 - Every script `package.json` advertises must exist (a test enforces it).
   Do not restore `promote`/`replay`/`smoke`; `smoke_dust_swap` is exec-plane
   and must not exist before the gate passes.
-- Before pushing: `pnpm install --frozen-lockfile`, typecheck, `pnpm layers`,
-  tests. Mutation-test new guards.
+- Before pushing: run `ci-parity` on `test.yml` (it runs CI's exact commands),
+  then mutation-test new guards.
 
 ## 6. Skills
 
@@ -92,4 +92,9 @@ Vendored from Solomons-Chamber into `.claude/skills/` so this repo is
 self-contained. Edit them **upstream** in Solomons-Chamber and re-vendor; a
 local edit creates a second source of truth.
 
-`measure-first` · `jev-architecture` · `paper-clock` · `outcome-resolution`
+`measure-first` · `jev-architecture` · `paper-clock` · `outcome-resolution` · `ci-parity` · `forecast-grading`
+
+**Before every push:** `python3 .claude/skills/ci-parity/scripts/ci_parity.py
+.github/workflows/test.yml` must exit 0. **Before reading any arm's numbers:**
+`python3 .claude/skills/forecast-grading/scripts/grade.py --hydra-journal
+ops/journal/jev-local.jsonl --arms <arms>`. Every table carries a coin.
