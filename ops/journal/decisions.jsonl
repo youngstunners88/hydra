@@ -335,3 +335,23 @@
 {"kind":"decision","record":{"id":"d173","action":"wallet_promotion@heuristic","answer":"0xccafa9074cbc6d3daaa6a86900bf7fabfeb43282:watchlisted->trusted","confidence":0.6754,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790987404934,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 2839798.445759 PLS @ 2026-10-03T00:29:15.000Z"}}
 {"kind":"decision","record":{"id":"d174","action":"wallet_promotion@heuristic","answer":"0x2059d6ed3397a3115c5a4cccc557914644af6400:watchlisted->trusted","confidence":0.623,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1790987404934,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 850000 PLS @ 2026-10-03T00:29:15.000Z"}}
 {"kind":"decision","record":{"id":"d175","action":"wallet_promotion@heuristic","answer":"0xcfb74778bf0fb4f3fe222f2348dbc5986ee5b6b4:watchlisted->trusted","confidence":0.7115,"route":"auto","thresholdVersion":1,"tauAtDecision":0.7,"at":1790987404934,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 6520807.593984 PLS @ 2026-10-03T00:29:15.000Z"}}
+{"kind":"outcome","id":"d157","outcome":true,"outcomeAt":1791009146980}
+{"kind":"outcome","id":"d158","outcome":true,"outcomeAt":1791009149705}
+{"kind":"outcome","id":"d159","outcome":true,"outcomeAt":1791009149942}
+{"kind":"outcome","id":"d160","outcome":true,"outcomeAt":1791009150175}
+{"kind":"outcome","id":"d161","outcome":true,"outcomeAt":1791009150555}
+{"kind":"outcome","id":"d162","outcome":true,"outcomeAt":1791009150790}
+{"kind":"outcome","id":"d163","outcome":true,"outcomeAt":1791009151024}
+{"kind":"outcome","id":"d164","outcome":true,"outcomeAt":1791009151291}
+{"kind":"outcome","id":"d165","outcome":true,"outcomeAt":1791009151524}
+{"kind":"outcome","id":"d166","outcome":true,"outcomeAt":1791009151793}
+{"kind":"outcome","id":"d167","outcome":true,"outcomeAt":1791009152061}
+{"kind":"outcome","id":"d168","outcome":true,"outcomeAt":1791009152296}
+{"kind":"outcome","id":"d169","outcome":true,"outcomeAt":1791009152565}
+{"kind":"outcome","id":"d170","outcome":true,"outcomeAt":1791009152832}
+{"kind":"outcome","id":"d171","outcome":true,"outcomeAt":1791009153099}
+{"kind":"outcome","id":"d172","outcome":true,"outcomeAt":1791009153368}
+{"kind":"outcome","id":"d173","outcome":true,"outcomeAt":1791009153636}
+{"kind":"outcome","id":"d174","outcome":false,"outcomeAt":1791009153867}
+{"kind":"outcome","id":"d175","outcome":false,"outcomeAt":1791009154101}
+{"kind":"decision","record":{"id":"d176","action":"wallet_promotion@heuristic","answer":"0x37a46b5a5eb8242a9b4a299366c8e3bb64a2b3f1:watchlisted->trusted","confidence":0.5146,"route":"escalated","thresholdVersion":1,"tauAtDecision":0.7,"at":1791009156121,"outcome":null,"outcomeAt":null,"note":"pulsechain-rpc-value-transfers 70000 PLS @ 2026-10-03T06:32:05.000Z"}}
